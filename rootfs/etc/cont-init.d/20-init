@@ -1,0 +1,28 @@
+#!/usr/bin/with-contenv bash
+set -a
+source /etc/colors.sh
+
+PREFFIX="[cont-init.d] $(s6-basename ${0}):"
+REGEN_CONFIG=${REGEN_CONFIG:-no}
+
+if [ -z "$SECRETS_SET" ]; then
+  echo "${PREFFIX}${Red} ERROR - Secrets are not set!"
+  exit 1
+fi
+
+# create mount folders
+RcloneMountPoint="${MountPoint%/*}/rclone"
+mkdir -p "${MountPoint%/}" "${RcloneMountPoint}"
+chmod 777 "${MountPoint%/}" "${RcloneMountPoint}"
+chown abc:abc "${MountPoint}" "${RcloneMountPoint}"
+
+# create config from template
+if [ ! -f ${RCLONE_CONFIG} ] || [ "${REGEN_CONFIG}" = "yes" ]; then
+  echo "**** creating rclone config ****"
+  (envsubst < /defaults/rclone_template) > ${RCLONE_CONFIG}
+else
+  echo "**** found config - not overwriting ****"
+fi
+
+# permissions for config files
+chown abc:abc -R /config
