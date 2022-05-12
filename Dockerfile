@@ -48,7 +48,6 @@ RUN set -eux && \
     /var/cache/apk/* \
     /var/lib/apk/lists/*
 
-COPY rclone/rootfs/ /
-COPY healthcheck-mount /usr/sbin/
+COPY rootfs/ /
 
 HEALTHCHECK --start-period=10s CMD /usr/sbin/healthcheck-mount
